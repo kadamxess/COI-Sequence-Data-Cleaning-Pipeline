@@ -30,18 +30,18 @@ except Exception as e:
 
 # ========== CLEANING STARTS ==========
 
-# 1️⃣ Remove duplicates
+#  Remove duplicates
 dup = df[df.duplicated("nucleotides")]
 dup.to_csv(removed_duplicates, index=False)
 df = df.drop_duplicates("nucleotides")
 
-# 2️⃣ Remove rows missing essential fields
+#  Remove rows missing essential fields
 required = ["nucleotides", "species_name"]
 missing = df[df[required].isna().any(axis=1)]
 missing.to_csv(removed_missing, index=False)
 df = df.dropna(subset=required)
 
-# 3️⃣ Clean sequence
+#  Clean sequence
 df["nucleotides"] = (
     df["nucleotides"]
     .astype(str)
@@ -49,12 +49,12 @@ df["nucleotides"] = (
     .str.replace(r"[^ATGC]", "", regex=True)
 )
 
-# 4️⃣ Remove short sequences (<500 bp)
+#  Remove short sequences (<500 bp)
 short = df[df["nucleotides"].str.len() < 500]
 short.to_csv(removed_short, index=False)
 df = df[df["nucleotides"].str.len() >= 500]
 
-# 5️⃣ Clean taxonomy capitalization
+#  Clean taxonomy capitalization
 tax_cols = ["processid","phylum_name","class_name","order_name",
             "family_name","genus_name","species_name"]
 
@@ -62,11 +62,11 @@ for c in tax_cols:
     if c in df.columns:
         df[c] = df[c].astype(str).str.strip().str.capitalize()
 
-# 6️⃣ Set missing phylum to Chordata
+#  Set missing phylum to Chordata
 df["phylum_name"] = df.get("phylum_name", "Chordata")
 df["phylum_name"] = df["phylum_name"].fillna("Chordata")
 
-# 7️⃣ Keep final columns only
+#  Keep final columns only
 final_cols = ["processid","phylum_name","class_name","order_name",
               "family_name","genus_name","species_name","country",
               "sequenceID","nucleotides"]
@@ -81,7 +81,7 @@ df.to_csv(output_file, index=False)
 print(f"[INFO] Saved cleaned file to: {output_file}")
 print("[INFO] Removed rows stored separately.")
 
-# ✅ Step 5: Display first few rows (works in both Colab and VS Code)
+#  Step 5: Display first few rows (works in both Colab and VS Code)
 try:
     from IPython.display import display
     display(df.head())
